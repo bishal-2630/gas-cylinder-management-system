@@ -1,8 +1,8 @@
 ---
 title: Gas Cylinder Management API
 emoji: 🛢️
-colorFrom: orange
-colorTo: red
+colorFrom: red
+colorTo: orange
 sdk: docker
 pinned: false
 ---
