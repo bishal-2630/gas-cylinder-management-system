@@ -19,4 +19,16 @@ jobs:
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: |
-          git push --force https://x-access-token:$HF_TOKEN@huggingface.co/spaces/Bishal26/gas_cylinder_management.git main:main
+          # Create a clean deployment folder to avoid pushing mobile binaries to HF
+          mkdir hf_deploy
+          cp -r backend hf_deploy/
+          cp Dockerfile hf_deploy/
+          cp README.md hf_deploy/
+          
+          cd hf_deploy
+          git init
+          git config user.name "github-actions"
+          git config user.email "github-actions@github.com"
+          git add .
+          git commit -m "Deploy backend to HF Space"
+          git push --force https://x-access-token:$HF_TOKEN@huggingface.co/spaces/Bishal26/gas_cylinder_management.git HEAD:main
