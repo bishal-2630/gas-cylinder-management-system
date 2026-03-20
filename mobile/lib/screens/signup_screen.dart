@@ -1,0 +1,109 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
+import '../models/user.dart';
+
+class SignupScreen extends StatefulWidget {
+  const SignupScreen({super.key});
+
+  @override
+  State<SignupScreen> createState() => _SignupScreenState();
+}
+
+class _SignupScreenState extends State<SignupScreen> {
+  final _usernameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  UserRole _selectedRole = UserRole.customer;
+
+  void _handleSignup() async {
+    if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please fill in required fields')),
+      );
+      return;
+    }
+
+    final success = await context.read<AuthProvider>().signup(
+      _usernameController.text,
+      _emailController.text,
+      _passwordController.text,
+      _selectedRole,
+    );
+
+    if (success && mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Account created! Please login.')),
+      );
+      Navigator.pop(context);
+    } else if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Signup failed. Username might be taken.')),
+      );
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Create Account')),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            const Text(
+              'Join the Nepal Gas Network',
+              style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.deepOrange),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 32),
+            TextField(
+              controller: _usernameController,
+              decoration: const InputDecoration(labelText: 'Username', border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _passwordController,
+              obscureText: true,
+              decoration: const InputDecoration(labelText: 'Password', border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 24),
+            const Text('I am a:', style: TextStyle(fontWeight: FontWeight.bold)),
+            ListTile(
+              title: const Text('Customer'),
+              leading: Radio<UserRole>(
+                value: UserRole.customer,
+                groupValue: _selectedRole,
+                onChanged: (value) => setState(() => _selectedRole = value!),
+              ),
+            ),
+            ListTile(
+              title: const Text('Dealer / Seller'),
+              leading: Radio<UserRole>(
+                value: UserRole.dealer,
+                groupValue: _selectedRole,
+                onChanged: (value) => setState(() => _selectedRole = value!),
+              ),
+            ),
+            const SizedBox(height: 32),
+            ElevatedButton(
+              onPressed: _handleSignup,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.deepOrange,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+              ),
+              child: const Text('SIGN UP'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}

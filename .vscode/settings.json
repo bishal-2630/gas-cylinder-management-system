@@ -1,0 +1,23 @@
+{
+    "python.defaultInterpreterPath": "${workspaceFolder}/backend/venv/Scripts/python.exe",
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}\\backend",
+        "${workspaceFolder}\\backend\\core",
+        "${workspaceFolder}\\backend\\api"
+    ],
+    "python.analysis.autoSearchPaths": true,
+    "python.terminal.activateEnvironment": true,
+    "python.languageServer": "Default",
+    "python.analysis.indexing": true,
+    "python.analysis.packageIndexDepths": [
+        {
+            "name": "django",
+            "depth": 5
+        },
+        {
+            "name": "rest_framework",
+            "depth": 5
+        }
+    ],
+    "java.configuration.updateBuildConfiguration": "interactive"
+}
