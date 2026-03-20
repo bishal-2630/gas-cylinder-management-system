@@ -135,8 +135,6 @@ class _MapScreenState extends State<MapScreen> {
       },
     );
   }
-    );
-  }
 
   void _showDealerDetails(BuildContext context, Dealer dealer) {
     showModalBottomSheet(
@@ -190,6 +188,7 @@ class _MapScreenState extends State<MapScreen> {
               const SizedBox(height: 10),
               const Text('Quick Report:'),
               const SizedBox(height: 10),
+              Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton.icon(

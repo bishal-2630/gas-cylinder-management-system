@@ -78,7 +78,7 @@ class DealerDetailScreen extends StatelessWidget {
     
     return Card(
       elevation: 4,
-      shape: RoundedRectangleBorder(radius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
