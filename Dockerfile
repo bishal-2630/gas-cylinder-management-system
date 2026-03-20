@@ -1,5 +1,5 @@
-# Use an official Python runtime
-FROM python:3.11-slim
+# Use an official Python runtime with Python 3.12 (required for Django 6.0)
+FROM python:3.12-slim
 
 # Set environment variables
 ENV PYTHONDONTWRITEBYTECODE=1
