@@ -56,7 +56,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
-    'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    # 'django.middleware.clickjacking.XFrameOptionsMiddleware', # Disabled for HF iframe
 ]
 
 CORS_ALLOW_ALL_ORIGINS = True  # For development only. Restrict in production.
@@ -67,6 +67,11 @@ REST_FRAMEWORK = {
     )
 }
 
+# Hugging Face Iframe and Proxy Settings
+X_FRAME_OPTIONS = 'ALLOWALL'
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+USE_X_FORWARDED_HOST = True
+CSRF_TRUSTED_ORIGINS = ['https://*.hf.space', 'https://*.huggingface.co']
 
 ROOT_URLCONF = 'backend_api.urls'
 
