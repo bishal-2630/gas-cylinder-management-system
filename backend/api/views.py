@@ -16,6 +16,14 @@ class DealerViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = Dealer.objects.all()
     serializer_class = DealerSerializer
 
+class IsDealerOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        # Check for OfficialStock (obj.dealer) or Dealer (obj)
+        dealer = obj.dealer if hasattr(obj, 'dealer') else obj
+        return dealer.user == request.user
+
 class OfficialStockViewSet(viewsets.ModelViewSet):
     """
     List and update official stock.
@@ -85,13 +93,6 @@ from core.models import QueueToken
 from .serializers import QueueTokenSerializer
 from django.utils import timezone
 
-class IsDealerOwner(permissions.BasePermission):
-    def has_object_permission(self, request, view, obj):
-        if request.method in permissions.SAFE_METHODS:
-            return True
-        # Check for OfficialStock (obj.dealer) or Dealer (obj)
-        dealer = obj.dealer if hasattr(obj, 'dealer') else obj
-        return dealer.user == request.user
 
 class QueueTokenViewSet(viewsets.ModelViewSet):
     queryset = QueueToken.objects.all()
