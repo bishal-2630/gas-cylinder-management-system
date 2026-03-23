@@ -23,10 +23,9 @@ class OfficialStockViewSet(viewsets.ModelViewSet):
     """
     queryset = OfficialStock.objects.all()
     serializer_class = OfficialStockSerializer
-    permission_classes = [permissions.IsAuthenticatedOrReadOnly] # Allow read, require auth to update
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsDealerOwner]
 
     def perform_update(self, serializer):
-        # In a real app, ensure self.request.user.dealer_profile == serializer.instance.dealer
         serializer.save()
 
 class CommunitySightingViewSet(viewsets.ModelViewSet):
@@ -72,12 +71,44 @@ class ProfileViewSet(viewsets.ViewSet):
         UserProfile.objects.create(user=user, role=role)
         
         if role == 'DEALER':
-            # Create a placeholder dealer profile. The dealer can update name/location later.
-            Dealer.objects.create(
+            dealer = Dealer.objects.create(
                 user=user, 
                 name=username, 
                 latitude=27.7172, 
-                longitude=85.3240 # Default to Kathmandu center
+                longitude=85.3240
             )
+            OfficialStock.objects.create(dealer=dealer)
         
         return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
+
+from core.models import QueueToken
+from .serializers import QueueTokenSerializer
+from django.utils import timezone
+
+class IsDealerOwner(permissions.BasePermission):
+    def has_object_permission(self, request, view, obj):
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        # Check for OfficialStock (obj.dealer) or Dealer (obj)
+        dealer = obj.dealer if hasattr(obj, 'dealer') else obj
+        return dealer.user == request.user
+
+class QueueTokenViewSet(viewsets.ModelViewSet):
+    queryset = QueueToken.objects.all()
+    serializer_class = QueueTokenSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def perform_create(self, serializer):
+        dealer = serializer.validated_data['dealer']
+        next_number = QueueToken.objects.filter(dealer=dealer).count() + 1
+        serializer.save(user=self.request.user, token_number=next_number)
+
+    @action(detail=True, methods=['post'])
+    def fulfill(self, request, pk=None):
+        token = self.get_object()
+        if token.dealer.user != request.user:
+            return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+        token.is_fulfilled = True
+        token.fulfilled_at = timezone.now()
+        token.save()
+        return Response({'status': 'token fulfilled'})

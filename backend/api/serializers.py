@@ -44,3 +44,17 @@ class CommunitySightingSerializer(serializers.ModelSerializer):
     class Meta:
         model = CommunitySighting
         fields = ['id', 'dealer_id', 'dealer', 'reporter_name', 'reported_at', 'is_available', 'notes']
+
+from core.models import QueueToken
+
+class QueueTokenSerializer(serializers.ModelSerializer):
+    dealer_id = serializers.PrimaryKeyRelatedField(
+        queryset=Dealer.objects.all(), source='dealer', write_only=True
+    )
+    dealer_name = serializers.CharField(source='dealer.name', read_only=True)
+    user_name = serializers.CharField(source='user.username', read_only=True)
+
+    class Meta:
+        model = QueueToken
+        fields = ['id', 'dealer_id', 'dealer_name', 'user_name', 'token_number', 'requested_at', 'is_fulfilled', 'fulfilled_at']
+        read_only_fields = ['token_number', 'requested_at', 'is_fulfilled', 'fulfilled_at']

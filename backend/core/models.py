@@ -82,3 +82,18 @@ class CommunitySighting(models.Model):
     def __str__(self):
         status = "Available" if self.is_available else "Out of Stock"
         return f"Sighting at {self.dealer.name}: {status} on {self.reported_at.date()}"
+
+class QueueToken(models.Model):
+    dealer = models.ForeignKey(Dealer, related_name='tokens', on_delete=models.CASCADE)
+    user = models.ForeignKey(User, related_name='tokens_requested', on_delete=models.CASCADE)
+    token_number = models.PositiveIntegerField()
+    requested_at = models.DateTimeField(auto_now_add=True)
+    is_fulfilled = models.BooleanField(default=False)
+    fulfilled_at = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        unique_together = ['dealer', 'token_number']
+        ordering = ['token_number']
+
+    def __str__(self):
+        return f"Token #{self.token_number} at {self.dealer.name} for {self.user.username}"

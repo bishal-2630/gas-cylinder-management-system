@@ -112,4 +112,49 @@ class ApiService {
       return false;
     }
   }
+
+  Future<Map<String, dynamic>?> fetchOfficialStock(int dealerId) async {
+    try {
+      final response = await http.get(Uri.parse('$baseUrl/stock/?dealer=$dealerId'));
+      if (response.statusCode == 200) {
+        List<dynamic> data = json.decode(response.body);
+        if (data.isNotEmpty) return data[0];
+      }
+    } catch (e) {
+      print('Error fetching official stock: $e');
+    }
+    return null;
+  }
+
+  Future<bool> requestToken(String token, int dealerId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/tokens/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode({'dealer_id': dealerId}),
+      );
+      return response.statusCode == 201;
+    } catch (e) {
+      print('Token request error: $e');
+      return false;
+    }
+  }
+
+  Future<List<dynamic>> fetchTokens(String token, int dealerId) async {
+    try {
+      final response = await http.get(
+        Uri.parse('$baseUrl/tokens/?dealer=$dealerId'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      if (response.statusCode == 200) {
+        return json.decode(response.body);
+      }
+    } catch (e) {
+      print('Error fetching tokens: $e');
+    }
+    return [];
+  }
 }

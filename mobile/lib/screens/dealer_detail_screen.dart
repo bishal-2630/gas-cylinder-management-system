@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import '../models/dealer.dart';
-import 'package:intl/intl.dart';
+import 'package:provider/provider.dart';
+import '../providers/auth_provider.dart';
+import '../providers/dealer_provider.dart';
 
 class DealerDetailScreen extends StatelessWidget {
   final Dealer dealer;
@@ -131,25 +131,65 @@ class DealerDetailScreen extends StatelessWidget {
   }
 
   Widget _buildActionButtons(BuildContext context) {
-    return Row(
+    return Column(
       children: [
-        Expanded(
-          child: ElevatedButton.icon(
-            onPressed: () {
-              // Open external map
-            },
-            icon: const Icon(Icons.directions),
-            label: const Text('Directions'),
-          ),
+        Row(
+          children: [
+            Expanded(
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  // Open external map
+                },
+                icon: const Icon(Icons.directions),
+                label: const Text('Directions'),
+              ),
+            ),
+            const SizedBox(width: 10),
+            Expanded(
+              child: OutlinedButton.icon(
+                onPressed: () {
+                  // Share functionality
+                },
+                icon: const Icon(Icons.share),
+                label: const Text('Share Status'),
+              ),
+            ),
+          ],
         ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: OutlinedButton.icon(
-            onPressed: () {
-              // Share functionality
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
+          child: ElevatedButton.icon(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.orange[800],
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(vertical: 12),
+            ),
+            onPressed: () async {
+              final auth = context.read<AuthProvider>();
+              final dealerProvider = context.read<DealerProvider>();
+
+              if (!auth.isAuthenticated) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text('Please login to request a token')),
+                );
+                return;
+              }
+
+              final success = await dealerProvider.requestToken(auth.token!, dealer.id);
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(success 
+                      ? 'Token requested! Check your profile for updates.' 
+                      : 'Failed to request token. Try again later.'),
+                    backgroundColor: success ? Colors.green : Colors.red,
+                  ),
+                );
+              }
             },
-            icon: const Icon(Icons.share),
-            label: const Text('Share Status'),
+            icon: const Icon(Icons.confirmation_number),
+            label: const Text('Request Pick-up Token'),
           ),
         ),
       ],
