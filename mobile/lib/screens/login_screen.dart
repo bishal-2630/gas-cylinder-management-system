@@ -57,7 +57,10 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    const Icon(Icons.local_gas_station, size: 64, color: Colors.deepOrange),
+                    Image.asset(
+                      'assets/logo.png',
+                      height: 100,
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       'Gas Management',

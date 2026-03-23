@@ -52,8 +52,15 @@ class _SignupScreenState extends State<SignupScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
+            Center(
+              child: Image.asset(
+                'assets/logo.png',
+                height: 120,
+              ),
+            ),
+            const SizedBox(height: 16),
             const Text(
-              'Join the Nepal Gas Network',
+              'Join the Gas Management Network',
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.deepOrange),
               textAlign: TextAlign.center,
             ),
