@@ -100,7 +100,7 @@ class _MapScreenState extends State<MapScreen> {
             icon: _getMarkerColor(dealer.availabilityStatus),
             infoWindow: InfoWindow(
               title: dealer.name,
-              snippet: '${dealer.brandName} - ${dealer.availabilityStatus.replaceAll('_', ' ')}',
+              snippet: '${dealer.brandName} - ${(dealer.availabilityStatus ?? 'UNKNOWN').replaceAll('_', ' ')}',
               onTap: () => _showDealerDetails(context, dealer),
             ),
           );
@@ -149,7 +149,7 @@ class _MapScreenState extends State<MapScreen> {
               Text(dealer.name, style: Theme.of(context).textTheme.headlineSmall),
               Text(dealer.brandName, style: TextStyle(color: Colors.grey[600])),
               const SizedBox(height: 10),
-              Text('Status: ${dealer.availabilityStatus.replaceAll('_', ' ')}'),
+              Text('Status: ${(dealer.availabilityStatus ?? 'UNKNOWN').replaceAll('_', ' ')}'),
               const SizedBox(height: 20),
               SizedBox(
                 width: double.infinity,
