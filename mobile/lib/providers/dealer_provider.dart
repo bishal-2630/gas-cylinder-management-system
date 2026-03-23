@@ -49,7 +49,7 @@ class DealerProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> reportSighting(int dealerId, bool isAvailable, String notes) async {
+  Future<bool> addSighting(int dealerId, bool isAvailable, String notes) async {
     final success = await _apiService.reportSighting(dealerId, isAvailable, notes);
     if (success) await refreshDealers();
     return success;

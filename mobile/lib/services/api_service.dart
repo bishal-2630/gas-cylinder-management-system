@@ -157,4 +157,17 @@ class ApiService {
     }
     return [];
   }
+
+  Future<bool> fulfillToken(String token, int tokenId) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/tokens/$tokenId/fulfill/'),
+        headers: {'Authorization': 'Bearer $token'},
+      );
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Token fulfillment error: $e');
+      return false;
+    }
+  }
 }
