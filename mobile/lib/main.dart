@@ -29,7 +29,7 @@ class GasManagementApp extends StatelessWidget {
       title: 'Gas Management',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
-        useMaterial3: true,
+        useMaterial3: false,
       ),
       home: Consumer<AuthProvider>(
         builder: (context, auth, _) {
