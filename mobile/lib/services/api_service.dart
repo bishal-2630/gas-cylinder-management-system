@@ -4,8 +4,8 @@ import '../models/dealer.dart';
 import '../models/user.dart';
 
 class ApiService {
-  // Use 192.168.1.70 to allow physical devices on the same network to reach the host
-  static const String baseUrl = 'http://192.168.1.70:8000/api';
+  // Use the Hugging Face Space URL for the live server
+  static const String baseUrl = 'https://bishal26-gas-cylinder-management.hf.space/api';
 
   Future<List<Dealer>> fetchDealers() async {
     try {
