@@ -4,8 +4,8 @@ import '../models/dealer.dart';
 import '../models/user.dart';
 
 class ApiService {
-  // Use 10.0.2.2 for Android Emulator to reach localhost
-  static const String baseUrl = 'http://10.0.2.2:8000/api';
+  // Use 192.168.1.70 to allow physical devices on the same network to reach the host
+  static const String baseUrl = 'http://192.168.1.70:8000/api';
 
   Future<List<Dealer>> fetchDealers() async {
     try {
