@@ -106,6 +106,13 @@ DATABASES = {
     )
 }
 
+# Print the database configuration to the logs (Safe if we only print the engine type)
+print(f"DATABASE_ENGINE: {DATABASES['default'].get('ENGINE')}")
+if 'sqlite' in DATABASES['default'].get('ENGINE').lower():
+    print("WARNING: Using SQLite fallback. DATABASE_URL might be missing from Hugging Face Secrets.")
+else:
+    print("SUCCESS: Connected to remote database.")
+
 
 # Password validation
 # https://docs.djangoproject.com/en/6.0/ref/settings/#auth-password-validators
