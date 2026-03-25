@@ -64,25 +64,30 @@ class ProfileViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
     def signup(self, request):
+        username = request.data.get('username')
+        full_name = request.data.get('full_name')
         phone_number = request.data.get('phone_number')
         password = request.data.get('password')
         role = request.data.get('role')
-        name = request.data.get('name', '') # Optional friendly name
 
-        if not phone_number or not password or not role:
-            return Response({'error': 'Missing fields'}, status=status.HTTP_400_BAD_REQUEST)
+        if not username or not full_name or not phone_number or not password or not role:
+            return Response({'error': 'Missing required fields'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if User.objects.filter(username=phone_number).exists():
-            return Response({'error': 'Phone number already registered'}, status=status.HTTP_400_BAD_REQUEST)
+        if User.objects.filter(username=username).exists():
+            return Response({'error': 'Username already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Use phone number as username for simple built-in identity
-        user = User.objects.create_user(username=phone_number, password=password)
-        UserProfile.objects.create(user=user, role=role, phone_number=phone_number)
+        user = User.objects.create_user(username=username, password=password)
+        UserProfile.objects.create(
+            user=user, 
+            role=role, 
+            full_name=full_name, 
+            phone_number=phone_number
+        )
         
         if role == 'DEALER':
             dealer = Dealer.objects.create(
                 user=user, 
-                name=name or f"Dealer {phone_number[-4:]}", 
+                name=full_name, 
                 latitude=27.7172, 
                 longitude=85.3240,
                 phone_number=phone_number

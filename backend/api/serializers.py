@@ -5,7 +5,7 @@ from core.models import Brand, Dealer, OfficialStock, CommunitySighting, UserPro
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['role', 'phone_number']
+        fields = ['role', 'full_name', 'phone_number']
 
 class UserSerializer(serializers.ModelSerializer):
     profile = UserProfileSerializer(read_only=True)

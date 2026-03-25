@@ -11,24 +11,26 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  final _nameController = TextEditingController();
+  final _fullNameController = TextEditingController();
+  final _usernameController = TextEditingController();
   final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   UserRole _selectedRole = UserRole.customer;
 
   void _handleSignup() async {
-    if (_phoneController.text.isEmpty || _passwordController.text.isEmpty) {
+    if (_usernameController.text.isEmpty || _phoneController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in required fields (Phone & Password)')),
+        const SnackBar(content: Text('Please fill in required fields (Username, Mobile Number & Password)')),
       );
       return;
     }
 
     final success = await context.read<AuthProvider>().signup(
+      _usernameController.text,
+      _fullNameController.text,
       _phoneController.text,
       _passwordController.text,
       _selectedRole,
-      name: _nameController.text,
     );
 
     if (success && mounted) {
@@ -66,8 +68,13 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
             const SizedBox(height: 32),
             TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Full Name (Optional)', border: OutlineInputBorder()),
+              controller: _fullNameController,
+              decoration: const InputDecoration(labelText: 'Full Name', border: OutlineInputBorder()),
+            ),
+            const SizedBox(height: 16),
+            TextField(
+              controller: _usernameController,
+              decoration: const InputDecoration(labelText: 'Username', border: OutlineInputBorder()),
             ),
             const SizedBox(height: 16),
             TextField(
