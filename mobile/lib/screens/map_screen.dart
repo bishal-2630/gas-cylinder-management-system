@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong2.dart';
 import 'package:provider/provider.dart';
 import '../providers/dealer_provider.dart';
 import '../models/dealer.dart';
@@ -17,23 +18,19 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   int _selectedIndex = 0;
-  late GoogleMapController mapController;
+  final MapController _mapController = MapController();
   final LatLng _center = const LatLng(27.7172, 85.3240); // Kathmandu
 
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-  }
-
-  BitmapDescriptor _getMarkerColor(String status) {
+  Color _getMarkerColor(String status) {
     switch (status) {
       case 'OFFICIAL_AVAILABLE':
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
+        return Colors.green;
       case 'COMMUNITY_CONFIRMED':
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueAzure);
+        return Colors.blue;
       case 'COMMUNITY_REPORTED':
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow);
+        return Colors.yellow;
       default:
-        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
+        return Colors.red;
     }
   }
 
@@ -95,26 +92,35 @@ class _MapScreenState extends State<MapScreen> {
 
         final markers = provider.dealers.map((dealer) {
           return Marker(
-            markerId: MarkerId(dealer.id.toString()),
-            position: LatLng(dealer.latitude, dealer.longitude),
-            icon: _getMarkerColor(dealer.availabilityStatus),
-            infoWindow: InfoWindow(
-              title: dealer.name,
-              snippet: '${dealer.brandName} - ${(dealer.availabilityStatus ?? 'UNKNOWN').replaceAll('_', ' ')}',
+            point: LatLng(dealer.latitude, dealer.longitude),
+            width: 80,
+            height: 80,
+            child: GestureDetector(
               onTap: () => _showDealerDetails(context, dealer),
+              child: Icon(
+                Icons.location_on,
+                color: _getMarkerColor(dealer.availabilityStatus),
+                size: 40,
+              ),
             ),
           );
-        }).toSet();
+        }).toList();
 
         return Stack(
           children: [
-            GoogleMap(
-              onMapCreated: _onMapCreated,
-              initialCameraPosition: CameraPosition(
-                target: _center,
-                zoom: 12.0,
+            FlutterMap(
+              mapController: _mapController,
+              options: MapOptions(
+                initialCenter: _center,
+                initialZoom: 12.0,
               ),
-              markers: markers,
+              children: [
+                TileLayer(
+                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                  userAgentPackageName: 'com.example.app',
+                ),
+                MarkerLayer(markers: markers),
+              ],
             ),
             if (provider.isLoading)
               const Positioned(
