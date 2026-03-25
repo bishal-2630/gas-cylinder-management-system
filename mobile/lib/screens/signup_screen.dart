@@ -11,24 +11,24 @@ class SignupScreen extends StatefulWidget {
 }
 
 class _SignupScreenState extends State<SignupScreen> {
-  final _usernameController = TextEditingController();
-  final _emailController = TextEditingController();
+  final _nameController = TextEditingController();
+  final _phoneController = TextEditingController();
   final _passwordController = TextEditingController();
   UserRole _selectedRole = UserRole.customer;
 
   void _handleSignup() async {
-    if (_usernameController.text.isEmpty || _passwordController.text.isEmpty) {
+    if (_phoneController.text.isEmpty || _passwordController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please fill in required fields')),
+        const SnackBar(content: Text('Please fill in required fields (Phone & Password)')),
       );
       return;
     }
 
     final success = await context.read<AuthProvider>().signup(
-      _usernameController.text,
-      _emailController.text,
+      _phoneController.text,
       _passwordController.text,
       _selectedRole,
+      name: _nameController.text,
     );
 
     if (success && mounted) {
@@ -66,13 +66,14 @@ class _SignupScreenState extends State<SignupScreen> {
             ),
             const SizedBox(height: 32),
             TextField(
-              controller: _usernameController,
-              decoration: const InputDecoration(labelText: 'Username', border: OutlineInputBorder()),
+              controller: _nameController,
+              decoration: const InputDecoration(labelText: 'Full Name (Optional)', border: OutlineInputBorder()),
             ),
             const SizedBox(height: 16),
             TextField(
-              controller: _emailController,
-              decoration: const InputDecoration(labelText: 'Email', border: OutlineInputBorder()),
+              controller: _phoneController,
+              keyboardType: TextInputType.phone,
+              decoration: const InputDecoration(labelText: 'Mobile Number', border: OutlineInputBorder()),
             ),
             const SizedBox(height: 16),
             TextField(

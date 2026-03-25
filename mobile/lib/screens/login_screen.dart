@@ -72,9 +72,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 32),
                     TextField(
                       controller: _usernameController,
+                      keyboardType: TextInputType.phone,
                       decoration: const InputDecoration(
-                        labelText: 'Username',
-                        prefixIcon: Icon(Icons.person),
+                        labelText: 'Mobile Number',
+                        prefixIcon: Icon(Icons.phone),
                         border: OutlineInputBorder(),
                       ),
                     ),

@@ -56,16 +56,16 @@ class ApiService {
     return null;
   }
 
-  Future<bool> signup(String username, String email, String password, UserRole role) async {
+  Future<bool> signup(String phoneNumber, String password, UserRole role, {String? name}) async {
     try {
       final response = await http.post(
-        Uri.parse('$baseUrl/profile/signup/'), // We need to create this endpoint
+        Uri.parse('$baseUrl/profile/signup/'),
         headers: {'Content-Type': 'application/json'},
         body: json.encode({
-          'username': username,
-          'email': email,
+          'phone_number': phoneNumber,
           'password': password,
           'role': role == UserRole.dealer ? 'DEALER' : 'CUSTOMER',
+          'name': name ?? '',
         }),
       );
       return response.statusCode == 201;

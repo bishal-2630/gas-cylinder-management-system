@@ -6,7 +6,6 @@ enum UserRole {
 class User {
   final int id;
   final String username;
-  final String email;
   final UserRole role;
   final String? phoneNumber;
   final int? dealerId;
@@ -14,7 +13,6 @@ class User {
   User({
     required this.id,
     required this.username,
-    required this.email,
     required this.role,
     this.phoneNumber,
     this.dealerId,
@@ -24,7 +22,6 @@ class User {
     return User(
       id: json['id'],
       username: json['username'],
-      email: json['email'],
       role: json['profile']['role'] == 'DEALER' ? UserRole.dealer : UserRole.customer,
       phoneNumber: json['profile']['phone_number'],
       dealerId: json['dealer_profile_id'], // Need to update backend serializer!
