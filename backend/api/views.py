@@ -90,7 +90,12 @@ class ProfileViewSet(viewsets.ViewSet):
                 name=full_name, 
                 latitude=27.7172, 
                 longitude=85.3240,
-                phone_number=phone_number
+                phone_number=phone_number,
+                license_number=request.data.get('license_number', ''),
+                pan_number=request.data.get('pan_number', ''),
+                opening_time=request.data.get('opening_time'),
+                closing_time=request.data.get('closing_time'),
+                contact_person=request.data.get('contact_person', full_name)
             )
             OfficialStock.objects.create(dealer=dealer)
         

@@ -25,7 +25,12 @@ class DealerSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Dealer
-        fields = ['id', 'name', 'brand', 'brand_name', 'latitude', 'longitude', 'address', 'phone_number', 'is_verified', 'availability_status']
+        fields = [
+            'id', 'name', 'brand', 'brand_name', 'latitude', 'longitude', 
+            'address', 'phone_number', 'license_number', 'pan_number', 
+            'opening_time', 'closing_time', 'contact_person', 
+            'is_verified', 'availability_status'
+        ]
 
 class OfficialStockSerializer(serializers.ModelSerializer):
     dealer = DealerSerializer(read_only=True)

@@ -37,6 +37,11 @@ class Dealer(models.Model):
     longitude = models.FloatField()
     address = models.TextField(blank=True)
     phone_number = models.CharField(max_length=15, blank=True)
+    license_number = models.CharField(max_length=100, blank=True)
+    pan_number = models.CharField(max_length=100, blank=True)
+    opening_time = models.TimeField(null=True, blank=True)
+    closing_time = models.TimeField(null=True, blank=True)
+    contact_person = models.CharField(max_length=255, blank=True)
     is_verified = models.BooleanField(default=False)
     
     @property
