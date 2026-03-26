@@ -56,7 +56,18 @@ class ApiService {
     return null;
   }
 
-  Future<bool> signup(String username, String fullName, String phoneNumber, String password, UserRole role) async {
+  Future<bool> signup({
+    required String username, 
+    required String fullName, 
+    required String phoneNumber, 
+    required String password, 
+    required UserRole role,
+    String? licenseNumber,
+    String? panNumber,
+    String? openingTime,
+    String? closingTime,
+    String? contactPerson,
+  }) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/profile/signup/'),
@@ -67,6 +78,11 @@ class ApiService {
           'phone_number': phoneNumber,
           'password': password,
           'role': role == UserRole.dealer ? 'DEALER' : 'CUSTOMER',
+          'license_number': licenseNumber,
+          'pan_number': panNumber,
+          'opening_time': openingTime,
+          'closing_time': closingTime,
+          'contact_person': contactPerson,
         }),
       );
       return response.statusCode == 201;

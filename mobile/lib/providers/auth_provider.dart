@@ -57,11 +57,33 @@ class AuthProvider with ChangeNotifier {
     return false;
   }
 
-  Future<bool> signup(String username, String fullName, String phoneNumber, String password, UserRole role) async {
+  Future<bool> signup({
+    required String username, 
+    required String fullName, 
+    required String phoneNumber, 
+    required String password, 
+    required UserRole role,
+    String? licenseNumber,
+    String? panNumber,
+    String? openingTime,
+    String? closingTime,
+    String? contactPerson,
+  }) async {
     _isLoading = true;
     notifyListeners();
 
-    final success = await _apiService.signup(username, fullName, phoneNumber, password, role);
+    final success = await _apiService.signup(
+      username: username,
+      fullName: fullName,
+      phoneNumber: phoneNumber,
+      password: password,
+      role: role,
+      licenseNumber: licenseNumber,
+      panNumber: panNumber,
+      openingTime: openingTime,
+      closingTime: closingTime,
+      contactPerson: contactPerson,
+    );
     
     _isLoading = false;
     notifyListeners();
