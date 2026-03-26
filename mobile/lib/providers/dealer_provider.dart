@@ -58,4 +58,15 @@ class DealerProvider with ChangeNotifier {
   Future<bool> requestToken(String token, int dealerId) async {
     return await _apiService.requestToken(token, dealerId);
   }
+
+  List<Map<String, dynamic>> _nearbyPlaces = [];
+  List<Map<String, dynamic>> get nearbyPlaces => _nearbyPlaces;
+
+  Future<void> findNearbyGasStores(double lat, double lng) async {
+    _isLoading = true;
+    notifyListeners();
+    _nearbyPlaces = await _apiService.fetchNearbyPlaces(lat, lng);
+    _isLoading = false;
+    notifyListeners();
+  }
 }

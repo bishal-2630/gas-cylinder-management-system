@@ -104,38 +104,91 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
+  void _onCameraMove(CameraPosition position) {
+    _center = position.target;
+  }
+
+  void _onCameraIdle() {
+    // Optionally fetch nearby places when camera stops moving
+    // context.read<DealerProvider>().findNearbyGasStores(_center.latitude, _center.longitude);
+  }
+
   Widget _buildMap(BuildContext context) {
     return Consumer<DealerProvider>(
       builder: (context, provider, child) {
-        if (provider.isLoading && provider.dealers.isEmpty) {
+        if (provider.isLoading && provider.dealers.isEmpty && provider.nearbyPlaces.isEmpty) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final Set<Marker> markers = provider.dealers.map((dealer) {
+        final Set<Marker> markers = {};
+        
+        // 1. Official/Community Dealers (from our DB)
+        markers.addAll(provider.dealers.map((dealer) {
           return Marker(
             markerId: MarkerId(dealer.id.toString()),
             position: LatLng(dealer.latitude, dealer.longitude),
             icon: _getMarkerIcon(dealer.availabilityStatus),
             onTap: () => _showDealerDetails(context, dealer),
+            infoWindow: InfoWindow(title: dealer.name, snippet: dealer.brandName),
+          );
+        }));
+
+        // 2. Nearby Places (from Google API)
+        markers.addAll(provider.nearbyPlaces.map((place) {
+          final location = place['geometry']['location'];
+          final placeId = place['place_id'];
+          
+          // Check if this place is already in our dealers list to avoid duplicates
+          final alreadyManaged = provider.dealers.any((d) => 
+            (d.latitude - location['lat'] as double).abs() < 0.0001 && 
+            (d.longitude - location['lng'] as double).abs() < 0.0001);
+
+          if (alreadyManaged) return null;
+
+          return Marker(
+            markerId: MarkerId('google_$placeId'),
+            position: LatLng(location['lat'], location['lng']),
+            icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueCyan), // Cyan for Google POIs
             infoWindow: InfoWindow(
-              title: dealer.name,
-              snippet: dealer.brandName,
+              title: place['name'],
+              snippet: 'Found via Google Maps',
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => CommunityReportScreen(
+                      prefillName: place['name'],
+                      prefillAddress: place['vicinity'],
+                      fixedLat: location['lat'],
+                      fixedLng: location['lng'],
+                    ),
+                  ),
+                );
+              },
             ),
           );
-        }).toSet();
+        }).whereType<Marker>());
 
         return Stack(
           children: [
             GoogleMap(
               onMapCreated: (controller) => _mapController = controller,
-              initialCameraPosition: CameraPosition(
-                target: _center,
-                zoom: 12.0,
-              ),
+              initialCameraPosition: CameraPosition(target: _center, zoom: 12.0),
               markers: markers,
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
-              padding: const EdgeInsets.only(bottom: 70), // Avoid FAB overlap
+              onCameraMove: _onCameraMove,
+              onCameraIdle: _onCameraIdle,
+              padding: const EdgeInsets.only(bottom: 70),
+            ),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: FloatingActionButton.small(
+                onPressed: () => provider.findNearbyGasStores(_center.latitude, _center.longitude),
+                backgroundColor: Colors.white,
+                child: const Icon(Icons.search, color: Colors.deepOrange),
+              ),
             ),
             if (provider.isLoading)
               const Positioned(

@@ -210,4 +210,27 @@ class ApiService {
       return false;
     }
   }
+
+  // Google Places API Key (Using the same one provided for Android/iOS)
+  static const String googleMapsApiKey = 'AIzaSyBlBI8VS5joyt525hxNxYqabaHyp7kFKoE';
+
+  Future<List<Map<String, dynamic>>> fetchNearbyPlaces(double lat, double lng) async {
+    // Search for gas cylinder dealers and depots within 5km
+    final url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
+        '?location=$lat,$lng'
+        '&radius=5000'
+        '&keyword=gas%20cylinder%20dealer|gas%20depot|LPG%20gas%20store'
+        '&key=$googleMapsApiKey';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return List<Map<String, dynamic>>.from(data['results'] ?? []);
+      }
+    } catch (e) {
+      print('Error fetching nearby places: $e');
+    }
+    return [];
+  }
 }

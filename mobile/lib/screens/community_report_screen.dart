@@ -5,7 +5,18 @@ import '../providers/dealer_provider.dart';
 import '../services/api_service.dart';
 
 class CommunityReportScreen extends StatefulWidget {
-  const CommunityReportScreen({super.key});
+  final String? prefillName;
+  final String? prefillAddress;
+  final double? fixedLat;
+  final double? fixedLng;
+
+  const CommunityReportScreen({
+    super.key, 
+    this.prefillName,
+    this.prefillAddress,
+    this.fixedLat,
+    this.fixedLng,
+  });
 
   @override
   State<CommunityReportScreen> createState() => _CommunityReportScreenState();
@@ -13,11 +24,17 @@ class CommunityReportScreen extends StatefulWidget {
 
 class _CommunityReportScreenState extends State<CommunityReportScreen> {
   final _apiService = ApiService();
-  final _nameController = TextEditingController();
+  late final TextEditingController _nameController;
   final _notesController = TextEditingController();
   String _selectedBrand = 'NEPAL_GAS';
   bool _isAvailable = true;
   bool _isSubmitting = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.prefillName);
+  }
 
   final Map<String, String> _brands = {
     'NEPAL_GAS': 'Nepal Gas',
@@ -36,16 +53,26 @@ class _CommunityReportScreenState extends State<CommunityReportScreen> {
     setState(() => _isSubmitting = true);
 
     try {
-      // 1. Get current location
-      final position = await Geolocator.getCurrentPosition();
+      // 1. Get position (use fixed if from Google, else GPS)
+      double lat;
+      double lng;
+      
+      if (widget.fixedLat != null && widget.fixedLng != null) {
+        lat = widget.fixedLat!;
+        lng = widget.fixedLng!;
+      } else {
+        final position = await Geolocator.getCurrentPosition();
+        lat = position.latitude;
+        lng = position.longitude;
+      }
       
       // 2. Create Dealer
       final dealer = await _apiService.createDealer(
         _nameController.text,
         _selectedBrand,
-        position.latitude,
-        position.longitude,
-        'Community added location',
+        lat,
+        lng,
+        widget.prefillAddress ?? 'Community added location',
       );
 
       if (dealer != null) {
