@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong2.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import '../providers/dealer_provider.dart';
 import '../models/dealer.dart';
@@ -18,19 +17,21 @@ class MapScreen extends StatefulWidget {
 
 class _MapScreenState extends State<MapScreen> {
   int _selectedIndex = 0;
-  final MapController _mapController = MapController();
+  GoogleMapController? _mapController;
   final LatLng _center = const LatLng(27.7172, 85.3240); // Kathmandu
 
-  Color _getMarkerColor(String status) {
+  BitmapDescriptor _getMarkerIcon(String status) {
+    // Note: In a real app, you might use different asset icons.
+    // For now, we'll use hue-based colors for Google Maps pins.
     switch (status) {
       case 'OFFICIAL_AVAILABLE':
-        return Colors.green;
+        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueGreen);
       case 'COMMUNITY_CONFIRMED':
-        return Colors.blue;
+        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
       case 'COMMUNITY_REPORTED':
-        return Colors.yellow;
+        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueYellow);
       default:
-        return Colors.red;
+        return BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed);
     }
   }
 
@@ -69,17 +70,6 @@ class _MapScreenState extends State<MapScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Dealers'),
         ],
       ),
-      floatingActionButton: _selectedIndex == 0 
-        ? FloatingActionButton.extended(
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(content: Text('Tap a pin to report sighting')),
-              );
-            },
-            label: const Text('Report Sighting'),
-            icon: const Icon(Icons.add_location_alt),
-          )
-        : null,
     );
   }
 
@@ -90,37 +80,30 @@ class _MapScreenState extends State<MapScreen> {
           return const Center(child: CircularProgressIndicator());
         }
 
-        final markers = provider.dealers.map((dealer) {
+        final Set<Marker> markers = provider.dealers.map((dealer) {
           return Marker(
-            point: LatLng(dealer.latitude, dealer.longitude),
-            width: 80,
-            height: 80,
-            child: GestureDetector(
-              onTap: () => _showDealerDetails(context, dealer),
-              child: Icon(
-                Icons.location_on,
-                color: _getMarkerColor(dealer.availabilityStatus),
-                size: 40,
-              ),
+            markerId: MarkerId(dealer.id.toString()),
+            position: LatLng(dealer.latitude, dealer.longitude),
+            icon: _getMarkerIcon(dealer.availabilityStatus),
+            onTap: () => _showDealerDetails(context, dealer),
+            infoWindow: InfoWindow(
+              title: dealer.name,
+              snippet: dealer.brandName,
             ),
           );
-        }).toList();
+        }).toSet();
 
         return Stack(
           children: [
-            FlutterMap(
-              mapController: _mapController,
-              options: MapOptions(
-                initialCenter: _center,
-                initialZoom: 12.0,
+            GoogleMap(
+              onMapCreated: (controller) => _mapController = controller,
+              initialCameraPosition: CameraPosition(
+                target: _center,
+                zoom: 12.0,
               ),
-              children: [
-                TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.example.app',
-                ),
-                MarkerLayer(markers: markers),
-              ],
+              markers: markers,
+              myLocationEnabled: true,
+              myLocationButtonEnabled: true,
             ),
             if (provider.isLoading)
               const Positioned(
