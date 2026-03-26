@@ -8,13 +8,13 @@ from .serializers import (
     CommunitySightingSerializer, UserSerializer
 )
 
-class DealerViewSet(viewsets.ReadOnlyModelViewSet):
+class DealerViewSet(viewsets.ModelViewSet):
     """
-    List all dealers or retrieve a specific dealer.
-    Read-only for now; admin users manage dealers via Django Admin.
+    List all dealers or create a new community report.
     """
     queryset = Dealer.objects.all()
     serializer_class = DealerSerializer
+    permission_classes = [permissions.AllowAny]
 
 class IsDealerOwner(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):

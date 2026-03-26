@@ -30,7 +30,7 @@ class Brand(models.fields.CharField):
 # We might want to use GeoDjango's PointField if dealing with real coordinates, 
 # but starting with simple Lat/Lon floats for easier initial setup without PostGIS dependencies.
 class Dealer(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='dealer_profile')
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name='dealer_profile', null=True, blank=True)
     name = models.CharField(max_length=255)
     brand = models.CharField(max_length=50, choices=Brand.CHOICES, default=Brand.NEPAL_GAS)
     latitude = models.FloatField()

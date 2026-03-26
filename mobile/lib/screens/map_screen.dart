@@ -8,6 +8,7 @@ import '../models/dealer.dart';
 import 'dealer_list_screen.dart';
 import 'dealer_detail_screen.dart';
 import 'report_sighting_screen.dart';
+import 'community_report_screen.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -50,6 +51,13 @@ class _MapScreenState extends State<MapScreen> {
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
     }
+    
+    if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
+      final position = await Geolocator.getCurrentPosition();
+      _mapController?.animateCamera(
+        CameraUpdate.newLatLng(LatLng(position.latitude, position.longitude)),
+      );
+    }
   }
 
   @override
@@ -79,6 +87,20 @@ class _MapScreenState extends State<MapScreen> {
           BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Dealers'),
         ],
       ),
+      floatingActionButton: _selectedIndex == 0 
+        ? FloatingActionButton.extended(
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const CommunityReportScreen()),
+              );
+            },
+            label: const Text('Report Sighting'),
+            icon: const Icon(Icons.add_location_alt),
+            backgroundColor: Colors.deepOrange,
+            foregroundColor: Colors.white,
+          )
+        : null,
     );
   }
 
@@ -113,6 +135,7 @@ class _MapScreenState extends State<MapScreen> {
               markers: markers,
               myLocationEnabled: true,
               myLocationButtonEnabled: true,
+              padding: const EdgeInsets.only(bottom: 70), // Avoid FAB overlap
             ),
             if (provider.isLoading)
               const Positioned(
