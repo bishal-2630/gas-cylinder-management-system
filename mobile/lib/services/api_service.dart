@@ -114,6 +114,29 @@ class ApiService {
     }
   }
 
+  Future<Dealer?> createDealer(String name, String brand, double lat, double lng, String address) async {
+    try {
+      final response = await http.post(
+        Uri.parse('$baseUrl/dealers/'),
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({
+          'name': name,
+          'brand': brand,
+          'latitude': lat,
+          'longitude': lng,
+          'address': address,
+        }),
+      );
+      
+      if (response.statusCode == 201) {
+        return Dealer.fromJson(json.decode(response.body));
+      }
+    } catch (e) {
+      print('Error creating dealer: $e');
+    }
+    return null;
+  }
+
   Future<Map<String, dynamic>?> fetchOfficialStock(int dealerId) async {
     try {
       final response = await http.get(Uri.parse('$baseUrl/stock/?dealer=$dealerId'));
