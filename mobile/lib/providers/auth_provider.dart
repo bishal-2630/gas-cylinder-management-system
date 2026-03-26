@@ -8,7 +8,7 @@ class AuthProvider with ChangeNotifier {
   final _storage = const FlutterSecureStorage();
   
   User? _user;
-  bool _isLoading = false;
+  bool _isLoading = true; // Start with loading to check for persistent token
   String? _token;
 
   User? get user => _user;
@@ -21,20 +21,25 @@ class AuthProvider with ChangeNotifier {
   }
 
   Future<void> _tryAutoLogin() async {
-    _token = await _storage.read(key: 'jwt_token');
-    if (_token != null) {
-      _isLoading = true;
-      notifyListeners();
-      
-      _user = await _apiService.fetchUserProfile(_token!);
-      
-      if (_user == null) {
-        _token = null;
-        await _storage.delete(key: 'jwt_token');
+    try {
+      _token = await _storage.read(key: 'jwt_token');
+      if (_token != null) {
+        _user = await _apiService.fetchUserProfile(_token!);
+        
+        if (_user == null) {
+          // Token might be invalid or expired
+          _token = null;
+          await _storage.delete(key: 'jwt_token');
+        }
       }
+    } catch (e) {
+      print('Auto-login error: $e');
+      // On error (e.g. network timeout), don't delete the token, 
+      // just let the user try again or wait.
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
-    _isLoading = false;
-    notifyListeners();
   }
 
   Future<bool> login(String username, String password) async {
