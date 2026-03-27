@@ -236,27 +236,61 @@ class ApiService {
   static const String googleMapsApiKey = 'AIzaSyBlBI8VS5joyt525hxNxYqabaHyp7kFKoE';
 
   Future<List<Map<String, dynamic>>> fetchNearbyPlaces(double lat, double lng) async {
-    // Search for gas cylinder dealers and depots within 5km
-    final url = 'https://maps.googleapis.com/maps/api/place/nearbysearch/json'
-        '?location=$lat,$lng'
-        '&radius=5000'
-        '&keyword=gas%20cylinder%20dealer|gas%20depot|LPG%20gas%20store'
-        '&key=$googleMapsApiKey';
+    // Construct the URI properly to handle encoding of keywords and special characters
+    final Uri url = Uri.https('maps.googleapis.com', '/maps/api/place/nearbysearch/json', {
+      'location': '$lat,$lng',
+      'radius': '5000',
+      'keyword': 'gas cylinder dealer|gas depot|LPG gas store',
+      'key': googleMapsApiKey,
+    });
 
     try {
-      print('Places API request: $url');
-      final response = await http.get(Uri.parse(url));
-      print('Places API status: ${response.statusCode}');
-      print('Places API body: ${response.body.substring(0, response.body.length.clamp(0, 500))}');
+      print('Places API request URL: $url');
+      final response = await http.get(url);
+      
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         final status = data['status'];
-        print('Places API Google status: $status');
-        return List<Map<String, dynamic>>.from(data['results'] ?? []);
+        print('Places API status code: ${response.statusCode}');
+        print('Places API status message: $status');
+
+        if (status == 'OK') {
+          return List<Map<String, dynamic>>.from(data['results'] ?? []);
+        } else if (status == 'ZERO_RESULTS') {
+          print('No gas stores found in this area.');
+          return [];
+        } else {
+          // Log the full error message for debugging (e.g., REQUEST_DENIED, OVER_QUERY_LIMIT)
+          print('Google Places API Error: $status');
+          print('Full Error Response: ${response.body}');
+          return [];
+        }
+      } else {
+        print('HTTP Error ${response.statusCode}: ${response.body}');
       }
     } catch (e) {
-      print('Error fetching nearby places: $e');
+      print('Exception during nearby search: $e');
     }
     return [];
+  }
+
+  Future<Map<String, dynamic>?> searchPlace(String query) async {
+    final Uri url = Uri.https('maps.googleapis.com', '/maps/api/place/textsearch/json', {
+      'query': query,
+      'key': googleMapsApiKey,
+    });
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == 'OK' && (data['results'] as List).isNotEmpty) {
+          return data['results'][0];
+        }
+      }
+    } catch (e) {
+      print('Error searching place: $e');
+    }
+    return null;
   }
 }

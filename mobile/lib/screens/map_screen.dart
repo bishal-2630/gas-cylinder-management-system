@@ -22,6 +22,7 @@ class _MapScreenState extends State<MapScreen> {
   int _selectedIndex = 0;
   GoogleMapController? _mapController;
   LatLng _center = const LatLng(27.7172, 85.3240); // Kathmandu
+  final TextEditingController _searchController = TextEditingController();
 
   BitmapDescriptor _getMarkerIcon(String status) {
     // Note: In a real app, you might use different asset icons.
@@ -222,10 +223,78 @@ class _MapScreenState extends State<MapScreen> {
                   ),
                 ),
               ),
+            // Search Bar
+            Positioned(
+              top: 50,
+              left: 15,
+              right: 15,
+              child: Container(
+                height: 50,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(10),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.2),
+                      blurRadius: 10,
+                      offset: const Offset(0, 5),
+                    ),
+                  ],
+                ),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search for a location...',
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.only(left: 15, top: 15),
+                    suffixIcon: IconButton(
+                      icon: const Icon(Icons.search),
+                      onPressed: () => _onSearch(context),
+                    ),
+                  ),
+                  onSubmitted: (_) => _onSearch(context),
+                ),
+              ),
+            ),
           ],
         );
       },
     );
+  }
+
+  Future<void> _onSearch(BuildContext context) async {
+    final query = _searchController.text;
+    if (query.isEmpty) return;
+
+    // Use ApiService directly for simple geocoding/search
+    // In a real app, this might be gated by a provider
+    final result = await context.read<DealerProvider>().searchPlace(query);
+    
+    if (result != null) {
+      final location = result['geometry']['location'];
+      final latLng = LatLng(location['lat'], location['lng']);
+      
+      _mapController?.animateCamera(
+        CameraUpdate.newCameraPosition(
+          CameraPosition(target: latLng, zoom: 14.0),
+        ),
+      );
+      
+      setState(() {
+        _center = latLng;
+      });
+
+      // Optionally trigger a discovery search in the new area
+      if (mounted) {
+        context.read<DealerProvider>().findNearbyGasStores(latLng.latitude, latLng.longitude);
+      }
+    } else {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Location not found')),
+        );
+      }
+    }
   }
 
   void _showDealerDetails(BuildContext context, Dealer dealer) {

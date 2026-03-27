@@ -69,4 +69,8 @@ class DealerProvider with ChangeNotifier {
     _isLoading = false;
     notifyListeners();
   }
+
+  Future<Map<String, dynamic>?> searchPlace(String query) async {
+    return await _apiService.searchPlace(query);
+  }
 }
