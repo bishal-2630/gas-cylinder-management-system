@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../providers/dealer_provider.dart';
+import 'profile_screen.dart';
 
 class DealerDashboardScreen extends StatefulWidget {
   const DealerDashboardScreen({super.key});
@@ -42,8 +43,13 @@ class _DealerDashboardScreenState extends State<DealerDashboardScreen> {
             },
           ),
           IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => context.read<AuthProvider>().logout(),
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
           ),
         ],
       ),

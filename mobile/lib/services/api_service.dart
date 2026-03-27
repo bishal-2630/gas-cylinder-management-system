@@ -56,6 +56,27 @@ class ApiService {
     return null;
   }
 
+  Future<bool> updateUserProfile(String token, Map<String, dynamic> data) async {
+    try {
+      final response = await http.patch(
+        Uri.parse('$baseUrl/profile/update_me/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode(data),
+      );
+      if (response.statusCode == 200) {
+        return true;
+      }
+      print('Update profile failed: ${response.body}');
+      return false;
+    } catch (e) {
+      print('Update profile error: $e');
+      return false;
+    }
+  }
+
   Future<bool> signup({
     required String username, 
     required String fullName, 
@@ -223,9 +244,14 @@ class ApiService {
         '&key=$googleMapsApiKey';
 
     try {
+      print('Places API request: $url');
       final response = await http.get(Uri.parse(url));
+      print('Places API status: ${response.statusCode}');
+      print('Places API body: ${response.body.substring(0, response.body.length.clamp(0, 500))}');
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
+        final status = data['status'];
+        print('Places API Google status: $status');
         return List<Map<String, dynamic>>.from(data['results'] ?? []);
       }
     } catch (e) {

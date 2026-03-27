@@ -9,6 +9,7 @@ import 'dealer_list_screen.dart';
 import 'dealer_detail_screen.dart';
 import 'report_sighting_screen.dart';
 import 'community_report_screen.dart';
+import 'profile_screen.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({super.key});
@@ -20,7 +21,7 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen> {
   int _selectedIndex = 0;
   GoogleMapController? _mapController;
-  final LatLng _center = const LatLng(27.7172, 85.3240); // Kathmandu
+  LatLng _center = const LatLng(27.7172, 85.3240); // Kathmandu
 
   BitmapDescriptor _getMarkerIcon(String status) {
     // Note: In a real app, you might use different asset icons.
@@ -54,9 +55,17 @@ class _MapScreenState extends State<MapScreen> {
     
     if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
       final position = await Geolocator.getCurrentPosition();
-      _mapController?.animateCamera(
-        CameraUpdate.newLatLng(LatLng(position.latitude, position.longitude)),
-      );
+      final userLatLng = LatLng(position.latitude, position.longitude);
+      
+      // Update _center so the search button uses real location
+      setState(() => _center = userLatLng);
+      
+      _mapController?.animateCamera(CameraUpdate.newLatLng(userLatLng));
+      
+      // Auto-search for nearby gas stores on load
+      if (mounted) {
+        context.read<DealerProvider>().findNearbyGasStores(position.latitude, position.longitude);
+      }
     }
   }
 
@@ -69,6 +78,15 @@ class _MapScreenState extends State<MapScreen> {
           IconButton(
             icon: const Icon(Icons.refresh),
             onPressed: () => context.read<DealerProvider>().refreshDealers(),
+          ),
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const ProfileScreen()),
+              );
+            },
           ),
         ],
       ),

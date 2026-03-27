@@ -95,6 +95,22 @@ class AuthProvider with ChangeNotifier {
     return success;
   }
 
+  Future<bool> updateProfile(Map<String, dynamic> data) async {
+    if (_token == null) return false;
+    _isLoading = true;
+    notifyListeners();
+
+    final success = await _apiService.updateUserProfile(_token!, data);
+    
+    if (success) {
+      _user = await _apiService.fetchUserProfile(_token!);
+    }
+
+    _isLoading = false;
+    notifyListeners();
+    return success;
+  }
+
   Future<bool> updateStock(int dealerId, int full, int empty) async {
     if (_token == null) return false;
     _isLoading = true;

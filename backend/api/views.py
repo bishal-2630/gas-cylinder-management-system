@@ -101,6 +101,40 @@ class ProfileViewSet(viewsets.ViewSet):
         
         return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
 
+    @action(detail=False, methods=['put', 'patch'])
+    def update_me(self, request):
+        user = request.user
+        profile = getattr(user, 'profile', None)
+        if not profile:
+            return Response({'error': 'Profile not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Update UserProfile fields
+        full_name = request.data.get('full_name')
+        if full_name:
+            profile.full_name = full_name
+        
+        phone_number = request.data.get('phone_number')
+        if phone_number:
+            profile.phone_number = phone_number
+            
+        profile.save()
+
+        # Update Dealer fields if role is DEALER
+        if profile.role == 'DEALER' and hasattr(user, 'dealer_profile'):
+            dealer = user.dealer_profile
+            # Only update fields that are provided
+            dealer.name = request.data.get('dealer_name', dealer.name)
+            dealer.address = request.data.get('address', dealer.address)
+            dealer.phone_number = request.data.get('dealer_phone_number', dealer.phone_number)
+            dealer.contact_person = request.data.get('contact_person', dealer.contact_person)
+            if 'opening_time' in request.data and request.data['opening_time']:
+                dealer.opening_time = request.data['opening_time']
+            if 'closing_time' in request.data and request.data['closing_time']:
+                dealer.closing_time = request.data['closing_time']
+            dealer.save()
+
+        return Response(UserSerializer(user).data)
+
 from core.models import QueueToken
 from .serializers import QueueTokenSerializer
 from django.utils import timezone

@@ -6,6 +6,12 @@ class Dealer {
   final double latitude;
   final double longitude;
   final String address;
+  final String? phoneNumber;
+  final String? licenseNumber;
+  final String? panNumber;
+  final String? openingTime;
+  final String? closingTime;
+  final String? contactPerson;
   final bool isVerified;
   final String availabilityStatus;
 
@@ -17,6 +23,12 @@ class Dealer {
     required this.latitude,
     required this.longitude,
     required this.address,
+    this.phoneNumber,
+    this.licenseNumber,
+    this.panNumber,
+    this.openingTime,
+    this.closingTime,
+    this.contactPerson,
     required this.isVerified,
     required this.availabilityStatus,
   });
@@ -30,6 +42,12 @@ class Dealer {
       latitude: json['latitude'],
       longitude: json['longitude'],
       address: json['address'] ?? '',
+      phoneNumber: json['phone_number'],
+      licenseNumber: json['license_number'],
+      panNumber: json['pan_number'],
+      openingTime: json['opening_time'],
+      closingTime: json['closing_time'],
+      contactPerson: json['contact_person'],
       isVerified: json['is_verified'],
       availabilityStatus: json['availability_status'],
     );
