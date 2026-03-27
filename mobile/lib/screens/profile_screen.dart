@@ -15,7 +15,9 @@ class ProfileScreen extends StatelessWidget {
       builder: (context, authProvider, child) {
         final user = authProvider.user;
         if (user == null) {
-          return const Center(child: Text('Not logged in'));
+          return const Scaffold(
+            body: Center(child: Text('Not logged in')),
+          );
         }
 
         Dealer? dealerInfo;
@@ -46,6 +48,9 @@ class ProfileScreen extends StatelessWidget {
               IconButton(
                 icon: const Icon(Icons.logout),
                 onPressed: () async {
+                  // Pop back to the root (Home) before logging out to ensure 
+                  // the LoginScreen is shown correctly by main.dart
+                  Navigator.of(context).popUntil((route) => route.isFirst);
                   await authProvider.logout();
                 },
               ),
