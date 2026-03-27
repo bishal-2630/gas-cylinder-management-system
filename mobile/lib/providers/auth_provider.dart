@@ -73,6 +73,7 @@ class AuthProvider with ChangeNotifier {
     String? openingTime,
     String? closingTime,
     String? contactPerson,
+    String? brand,
   }) async {
     _isLoading = true;
     notifyListeners();
@@ -88,6 +89,7 @@ class AuthProvider with ChangeNotifier {
       openingTime: openingTime,
       closingTime: closingTime,
       contactPerson: contactPerson,
+      brand: brand,
     );
     
     _isLoading = false;

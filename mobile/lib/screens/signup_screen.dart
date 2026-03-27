@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../models/user.dart';
+import '../constants/brands.dart';
 
 class SignupScreen extends StatefulWidget {
   const SignupScreen({super.key});
@@ -24,6 +25,7 @@ class _SignupScreenState extends State<SignupScreen> {
   final _contactPersonController = TextEditingController();
 
   UserRole _selectedRole = UserRole.customer;
+  String _selectedBrand = 'NEPAL_GAS';
 
   void _handleSignup() async {
     if (_usernameController.text.isEmpty || _phoneController.text.isEmpty || _passwordController.text.isEmpty) {
@@ -44,6 +46,7 @@ class _SignupScreenState extends State<SignupScreen> {
       openingTime: _selectedRole == UserRole.dealer ? _openingTimeController.text : null,
       closingTime: _selectedRole == UserRole.dealer ? _closingTimeController.text : null,
       contactPerson: _selectedRole == UserRole.dealer ? _contactPersonController.text : null,
+      brand: _selectedRole == UserRole.dealer ? _selectedBrand : null,
     );
 
     if (success && mounted) {
@@ -131,6 +134,18 @@ class _SignupScreenState extends State<SignupScreen> {
             if (_selectedRole == UserRole.dealer) ...[
               const Divider(height: 48),
               const Text('Business Details', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.deepOrange)),
+              const SizedBox(height: 16),
+              DropdownButtonFormField<String>(
+                value: _selectedBrand,
+                decoration: const InputDecoration(labelText: 'Gas Brand', border: OutlineInputBorder()),
+                items: gasBrands.entries.map((entry) {
+                  return DropdownMenuItem(
+                    value: entry.key,
+                    child: Text(entry.value),
+                  );
+                }).toList(),
+                onChanged: (value) => setState(() => _selectedBrand = value!),
+              ),
               const SizedBox(height: 16),
               TextField(
                 controller: _licenseController,

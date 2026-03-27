@@ -88,6 +88,7 @@ class ProfileViewSet(viewsets.ViewSet):
             dealer = Dealer.objects.create(
                 user=user, 
                 name=full_name, 
+                brand=request.data.get('brand', 'NEPAL_GAS'),
                 latitude=27.7172, 
                 longitude=85.3240,
                 phone_number=phone_number,
@@ -124,6 +125,7 @@ class ProfileViewSet(viewsets.ViewSet):
             dealer = user.dealer_profile
             # Only update fields that are provided
             dealer.name = request.data.get('dealer_name', dealer.name)
+            dealer.brand = request.data.get('brand', dealer.brand)
             dealer.address = request.data.get('address', dealer.address)
             dealer.phone_number = request.data.get('dealer_phone_number', dealer.phone_number)
             dealer.contact_person = request.data.get('contact_person', dealer.contact_person)

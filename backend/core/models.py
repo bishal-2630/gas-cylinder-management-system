@@ -19,12 +19,57 @@ class UserProfile(models.Model):
 class Brand(models.fields.CharField):
     # Enum for gas brands in Nepal
     NEPAL_GAS = 'NEPAL_GAS'
+    STC = 'STC'
     EVEREST = 'EVEREST'
     SIDDHARTHA = 'SIDDHARTHA'
+    KOSHI = 'KOSHI'
+    BHERI = 'BHERI'
+    GANDAKI = 'GANDAKI'
+    JANAKI = 'JANAKI'
+    TRISHULI = 'TRISHULI'
+    BUTWAL = 'BUTWAL'
+    SAGAR = 'SAGAR'
+    SURYA = 'SURYA'
+    BABA = 'BABA'
+    OM = 'OM'
+    NARAYANI = 'NARAYANI'
+    MANOJ = 'MANOJ'
+    GRIHALAXMI = 'GRIHALAXMI'
+    PATHIBHARA = 'PATHIBHARA'
+    MECHI = 'MECHI'
+    LUMBINI = 'LUMBINI'
+    HIMAL = 'HIMAL'
+    JUALA = 'JUALA'
+    KANKAI = 'KANKAI'
+    ROYAL = 'ROYAL'
+    SHREERAM = 'SHREERAM'
+
     CHOICES = [
         (NEPAL_GAS, 'Nepal Gas'),
+        (STC, 'STC Gas'),
         (EVEREST, 'Everest Gas'),
         (SIDDHARTHA, 'Siddhartha Gas'),
+        (KOSHI, 'Koshi Gas'),
+        (BHERI, 'Bheri Gas'),
+        (GANDAKI, 'Gandaki Gas'),
+        (JANAKI, 'Janaki Gas'),
+        (TRISHULI, 'Trishuli Gas'),
+        (BUTWAL, 'Butwal Gas'),
+        (SAGAR, 'Sagar Gas'),
+        (SURYA, 'Surya Gas'),
+        (BABA, 'Baba Gas'),
+        (OM, 'OM Gas'),
+        (NARAYANI, 'Narayani Gas'),
+        (MANOJ, 'Manoj Gas'),
+        (GRIHALAXMI, 'Grihalaxmi Gas'),
+        (PATHIBHARA, 'Pathibhara Gas'),
+        (MECHI, 'Mechi Gas'),
+        (LUMBINI, 'Lumbini Gas'),
+        (HIMAL, 'Himal Gas'),
+        (JUALA, 'Jwala Gas'),
+        (KANKAI, 'Kankai Gas'),
+        (ROYAL, 'Royal Gas'),
+        (SHREERAM, 'Shreeram Gas'),
     ]
 
 # We might want to use GeoDjango's PointField if dealing with real coordinates, 

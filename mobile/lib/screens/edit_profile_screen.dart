@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../providers/auth_provider.dart';
 import '../models/user.dart';
 import '../models/dealer.dart';
+import '../constants/brands.dart';
 
 class EditProfileScreen extends StatefulWidget {
   final User user;
@@ -29,6 +30,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   TextEditingController? _openingTimeController;
   TextEditingController? _closingTimeController;
 
+  String? _selectedBrand;
   bool _isLoading = false;
 
   @override
@@ -45,6 +47,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       _contactPersonController = TextEditingController(text: widget.dealerInfo?.contactPerson ?? '');
       _openingTimeController = TextEditingController(text: widget.dealerInfo?.openingTime ?? '');
       _closingTimeController = TextEditingController(text: widget.dealerInfo?.closingTime ?? '');
+      _selectedBrand = widget.dealerInfo?.brand ?? 'NEPAL_GAS';
     }
   }
 
@@ -79,6 +82,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         data['contact_person'] = _contactPersonController?.text;
         data['opening_time'] = _openingTimeController?.text;
         data['closing_time'] = _closingTimeController?.text;
+        data['brand'] = _selectedBrand;
       }
 
       final authProvider = Provider.of<AuthProvider>(context, listen: false);
@@ -133,6 +137,18 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     if (widget.user.role == UserRole.dealer) ...[
                       const SizedBox(height: 32),
                       const Text('Dealership Information', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.deepOrange)),
+                      const SizedBox(height: 16),
+                      DropdownButtonFormField<String>(
+                        value: _selectedBrand,
+                        decoration: const InputDecoration(labelText: 'Gas Brand', border: OutlineInputBorder()),
+                        items: gasBrands.entries.map((entry) {
+                          return DropdownMenuItem(
+                            value: entry.key,
+                            child: Text(entry.value),
+                          );
+                        }).toList(),
+                        onChanged: (value) => setState(() => _selectedBrand = value!),
+                      ),
                       const SizedBox(height: 16),
                       TextFormField(
                         controller: _dealerNameController,

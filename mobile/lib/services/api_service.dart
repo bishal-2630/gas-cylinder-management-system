@@ -88,6 +88,7 @@ class ApiService {
     String? openingTime,
     String? closingTime,
     String? contactPerson,
+    String? brand,
   }) async {
     try {
       final response = await http.post(
@@ -104,6 +105,7 @@ class ApiService {
           'opening_time': openingTime,
           'closing_time': closingTime,
           'contact_person': contactPerson,
+          'brand': brand,
         }),
       );
       return response.statusCode == 201;
