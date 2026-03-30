@@ -7,7 +7,7 @@ router.register(r'dealers', DealerViewSet)
 router.register(r'stock', OfficialStockViewSet)
 router.register(r'sightings', CommunitySightingViewSet)
 router.register(r'profile', ProfileViewSet, basename='profile')
-router.register(r'tokens', QueueTokenViewSet)
+router.register(r'tokens', QueueTokenViewSet, basename='tokens')
 
 urlpatterns = [
     path('', include(router.urls)),
