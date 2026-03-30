@@ -5,6 +5,7 @@ import '../providers/dealer_provider.dart';
 import '../models/user.dart';
 import '../models/dealer.dart';
 import 'edit_profile_screen.dart';
+import 'my_tokens_screen.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -75,6 +76,23 @@ class ProfileScreen extends StatelessWidget {
                 _buildInfoTile('Username', user.username),
                 _buildInfoTile('Role', user.role.name.toUpperCase()),
                 _buildInfoTile('Phone Number', user.phoneNumber ?? 'Not provided'),
+                
+                if (user.role == UserRole.customer) ...[
+                  const SizedBox(height: 24),
+                  _buildSectionHeader('My Services'),
+                  ListTile(
+                    leading: const Icon(Icons.confirmation_number, color: Colors.deepOrange),
+                    title: const Text('My Pick-up Tokens'),
+                    subtitle: const Text('View your active queue tokens'),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const MyTokensScreen()),
+                      );
+                    },
+                    trailing: const Icon(Icons.chevron_right),
+                  ),
+                ],
 
                 if (dealerInfo != null) ...[
                   const SizedBox(height: 24),

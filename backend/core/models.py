@@ -128,6 +128,7 @@ class CommunitySighting(models.Model):
     dealer = models.ForeignKey(Dealer, related_name='sightings', on_delete=models.CASCADE)
     reported_at = models.DateTimeField(auto_now_add=True)
     is_available = models.BooleanField(default=True)
+    brand = models.CharField(max_length=50, choices=Brand.CHOICES, null=True, blank=True)
     notes = models.TextField(blank=True, help_text="e.g., Long queue, limited stock")
     
     def __str__(self):

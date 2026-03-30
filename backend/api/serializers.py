@@ -44,11 +44,12 @@ class CommunitySightingSerializer(serializers.ModelSerializer):
         queryset=Dealer.objects.all(), source='dealer', write_only=True
     )
     dealer = DealerSerializer(read_only=True)
+    brand_name = serializers.CharField(source='get_brand_display', read_only=True)
     reporter_name = serializers.CharField(source='reporter.username', read_only=True)
 
     class Meta:
         model = CommunitySighting
-        fields = ['id', 'dealer_id', 'dealer', 'reporter_name', 'reported_at', 'is_available', 'notes']
+        fields = ['id', 'dealer_id', 'dealer', 'reporter_name', 'reported_at', 'is_available', 'brand', 'brand_name', 'notes']
 
 from core.models import QueueToken
 

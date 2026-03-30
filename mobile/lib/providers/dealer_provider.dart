@@ -16,6 +16,12 @@ class DealerProvider with ChangeNotifier {
   List<dynamic> _tokens = [];
   List<dynamic> get tokens => _tokens;
 
+  List<dynamic> _userTokens = [];
+  List<dynamic> get userTokens => _userTokens;
+
+  String? _selectedBrandFilter;
+  String? get selectedBrandFilter => _selectedBrandFilter;
+
   Future<void> fetchStock(int dealerId) async {
     _officialStock = await _apiService.fetchOfficialStock(dealerId);
     notifyListeners();
@@ -30,6 +36,16 @@ class DealerProvider with ChangeNotifier {
       notifyListeners();
     } catch (e) {
       print('Error fetching tokens: $e');
+    }
+  }
+
+  Future<void> fetchUserTokens(String authToken) async {
+    try {
+      final response = await _apiService.fetchTokens(authToken);
+      _userTokens = response;
+      notifyListeners();
+    } catch (e) {
+      print('Error fetching user tokens: $e');
     }
   }
 
@@ -49,8 +65,20 @@ class DealerProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<bool> addSighting(int dealerId, bool isAvailable, String notes) async {
-    final success = await _apiService.reportSighting(dealerId, isAvailable, notes);
+  List<Dealer> get filteredDealers {
+    if (_selectedBrandFilter == null || _selectedBrandFilter!.isEmpty) {
+      return _dealers;
+    }
+    return _dealers.where((d) => d.brand == _selectedBrandFilter).toList();
+  }
+
+  void setBrandFilter(String? brand) {
+    _selectedBrandFilter = brand;
+    notifyListeners();
+  }
+
+  Future<bool> addSighting(int dealerId, bool isAvailable, String notes, [String? brand]) async {
+    final success = await _apiService.reportSighting(dealerId, isAvailable, notes, brand);
     if (success) await refreshDealers();
     return success;
   }

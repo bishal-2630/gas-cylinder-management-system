@@ -27,14 +27,14 @@ class DealerListScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (provider.dealers.isEmpty) {
-            return const Center(child: Text('No dealers found.'));
+          if (provider.filteredDealers.isEmpty) {
+            return const Center(child: Text('No dealers found matching the selected filter.'));
           }
 
           return ListView.builder(
-            itemCount: provider.dealers.length,
+            itemCount: provider.filteredDealers.length,
             itemBuilder: (context, index) {
-              final dealer = provider.dealers[index];
+              final dealer = provider.filteredDealers[index];
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                 child: ListTile(

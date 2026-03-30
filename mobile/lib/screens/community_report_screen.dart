@@ -3,6 +3,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:provider/provider.dart';
 import '../providers/dealer_provider.dart';
 import '../services/api_service.dart';
+import '../constants/brands.dart';
 
 class CommunityReportScreen extends StatefulWidget {
   final String? prefillName;
@@ -29,18 +30,6 @@ class _CommunityReportScreenState extends State<CommunityReportScreen> {
   String _selectedBrand = 'NEPAL_GAS';
   bool _isAvailable = true;
   bool _isSubmitting = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _nameController = TextEditingController(text: widget.prefillName);
-  }
-
-  final Map<String, String> _brands = {
-    'NEPAL_GAS': 'Nepal Gas',
-    'EVEREST': 'Everest Gas',
-    'SIDDHARTHA': 'Siddhartha Gas',
-  };
 
   void _submit() async {
     if (_nameController.text.isEmpty) {
@@ -77,7 +66,7 @@ class _CommunityReportScreenState extends State<CommunityReportScreen> {
 
       if (dealer != null) {
         // 3. Report Sighting
-        await _apiService.reportSighting(dealer.id, _isAvailable, _notesController.text);
+        await _apiService.reportSighting(dealer.id, _isAvailable, _notesController.text, _selectedBrand);
         
         if (mounted) {
           context.read<DealerProvider>().refreshDealers();
@@ -123,7 +112,7 @@ class _CommunityReportScreenState extends State<CommunityReportScreen> {
             const SizedBox(height: 10),
             DropdownButtonFormField<String>(
               value: _selectedBrand,
-              items: _brands.entries.map((e) {
+              items: gasBrands.entries.map((e) {
                 return DropdownMenuItem(value: e.key, child: Text(e.value));
               }).toList(),
               onChanged: (val) => setState(() => _selectedBrand = val!),

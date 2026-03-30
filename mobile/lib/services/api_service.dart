@@ -135,7 +135,7 @@ class ApiService {
     }
   }
 
-  Future<bool> reportSighting(int dealerId, bool isAvailable, String notes) async {
+  Future<bool> reportSighting(int dealerId, bool isAvailable, String notes, [String? brand]) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/sightings/'),
@@ -144,6 +144,7 @@ class ApiService {
           'dealer_id': dealerId,
           'is_available': isAvailable,
           'notes': notes,
+          'brand': brand,
         }),
       );
       return response.statusCode == 201;
@@ -206,10 +207,14 @@ class ApiService {
     }
   }
 
-  Future<List<dynamic>> fetchTokens(String token, int dealerId) async {
+  Future<List<dynamic>> fetchTokens(String token, [int? dealerId]) async {
     try {
+      String url = '$baseUrl/tokens/';
+      if (dealerId != null) {
+        url += '?dealer=$dealerId';
+      }
       final response = await http.get(
-        Uri.parse('$baseUrl/tokens/?dealer=$dealerId'),
+        Uri.parse(url),
         headers: {'Authorization': 'Bearer $token'},
       );
       if (response.statusCode == 200) {

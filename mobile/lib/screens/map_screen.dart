@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:geolocator/geolocator.dart';
 import '../providers/dealer_provider.dart';
 import '../models/dealer.dart';
+import '../constants/brands.dart';
 
 import 'dealer_list_screen.dart';
 import 'dealer_detail_screen.dart';
@@ -142,7 +143,7 @@ class _MapScreenState extends State<MapScreen> {
         final Set<Marker> markers = {};
         
         // 1. Official/Community Dealers (from our DB)
-        markers.addAll(provider.dealers.map((dealer) {
+        markers.addAll(provider.filteredDealers.map((dealer) {
           return Marker(
             markerId: MarkerId(dealer.id.toString()),
             position: LatLng(dealer.latitude, dealer.longitude),
@@ -256,6 +257,45 @@ class _MapScreenState extends State<MapScreen> {
                 ),
               ),
             ),
+            // Brand Filter Chips
+            Positioned(
+              top: 110,
+              left: 0,
+              right: 0,
+              child: SizedBox(
+                height: 50,
+                child: ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: 10),
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 4),
+                      child: FilterChip(
+                        label: const Text('All Brands'),
+                        selected: provider.selectedBrandFilter == null,
+                        onSelected: (_) => provider.setBrandFilter(null),
+                        selectedColor: Colors.deepOrange[100],
+                        checkmarkColor: Colors.deepOrange,
+                      ),
+                    ),
+                    ...gasBrands.entries.map((entry) {
+                      return Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: FilterChip(
+                          label: Text(entry.value),
+                          selected: provider.selectedBrandFilter == entry.key,
+                          onSelected: (selected) {
+                            provider.setBrandFilter(selected ? entry.key : null);
+                          },
+                          selectedColor: Colors.deepOrange[100],
+                          checkmarkColor: Colors.deepOrange,
+                        ),
+                      );
+                    }).toList(),
+                  ],
+                ),
+              ),
+            ),
           ],
         );
       },
@@ -353,13 +393,13 @@ class _MapScreenState extends State<MapScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   ElevatedButton.icon(
-                    onPressed: () => _submitSighting(context, dealer.id, true),
+                    onPressed: () => _submitSighting(context, dealer.id, true, dealer.brand),
                     icon: const Icon(Icons.check),
                     label: const Text('Available'),
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.green[100]),
                   ),
                   ElevatedButton.icon(
-                    onPressed: () => _submitSighting(context, dealer.id, false),
+                    onPressed: () => _submitSighting(context, dealer.id, false, dealer.brand),
                     icon: const Icon(Icons.close),
                     label: const Text('Out of Stock'),
                     style: ElevatedButton.styleFrom(backgroundColor: Colors.red[100]),
@@ -373,9 +413,9 @@ class _MapScreenState extends State<MapScreen> {
     );
   }
 
-  void _submitSighting(BuildContext context, int dealerId, bool isAvailable) async {
+  void _submitSighting(BuildContext context, int dealerId, bool isAvailable, String brand) async {
     Navigator.pop(context); // Close bottom sheet
-    final success = await context.read<DealerProvider>().addSighting(dealerId, isAvailable, 'Community report');
+    final success = await context.read<DealerProvider>().addSighting(dealerId, isAvailable, 'Quick community report', brand);
     
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../models/dealer.dart';
 import '../providers/dealer_provider.dart';
 import '../services/location_service.dart';
+import '../constants/brands.dart';
 
 class ReportSightingScreen extends StatefulWidget {
   final Dealer dealer;
@@ -18,6 +19,13 @@ class _ReportSightingScreenState extends State<ReportSightingScreen> {
   final _notesController = TextEditingController();
   bool _isAvailable = true;
   bool _isCheckingLocation = false;
+  late String _selectedBrand;
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedBrand = widget.dealer.brand;
+  }
 
   void _submitReport() async {
     setState(() => _isCheckingLocation = true);
@@ -53,6 +61,7 @@ class _ReportSightingScreenState extends State<ReportSightingScreen> {
       widget.dealer.id,
       _isAvailable,
       _notesController.text,
+      _selectedBrand,
     );
 
     if (success && mounted) {
@@ -102,6 +111,24 @@ class _ReportSightingScreenState extends State<ReportSightingScreen> {
                   ),
                 ),
               ],
+            ),
+            
+            const SizedBox(height: 30),
+            const Text('Which brand of gas?', style: TextStyle(fontWeight: FontWeight.bold)),
+            const SizedBox(height: 10),
+            DropdownButtonFormField<String>(
+              value: _selectedBrand,
+              items: gasBrands.entries.map((e) => DropdownMenuItem(
+                value: e.key,
+                child: Text(e.value),
+              )).toList(),
+              onChanged: (val) {
+                if (val != null) setState(() => _selectedBrand = val);
+              },
+              decoration: const InputDecoration(
+                border: OutlineInputBorder(),
+                contentPadding: EdgeInsets.symmetric(horizontal: 12),
+              ),
             ),
             
             const SizedBox(height: 30),

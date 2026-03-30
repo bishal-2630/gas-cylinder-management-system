@@ -143,9 +143,21 @@ from django.utils import timezone
 
 
 class QueueTokenViewSet(viewsets.ModelViewSet):
-    queryset = QueueToken.objects.all()
     serializer_class = QueueTokenSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        dealer_query = self.request.query_params.get('dealer')
+        
+        # If dealer param provided, filter by it (useful for public/admin views or specific checks)
+        if dealer_query:
+            return QueueToken.objects.filter(dealer_id=dealer_query)
+            
+        # Role-based default filtering
+        if hasattr(user, 'profile') and user.profile.role == 'DEALER' and hasattr(user, 'dealer_profile'):
+            return QueueToken.objects.filter(dealer=user.dealer_profile)
+        return QueueToken.objects.filter(user=user)
 
     def perform_create(self, serializer):
         dealer = serializer.validated_data['dealer']
